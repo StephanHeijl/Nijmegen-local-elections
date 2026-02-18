@@ -1,0 +1,1263 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nijmegen Kieswijzer 2026</title>
+    <style>
+        :root {
+            --primary: #1a3a5c;
+            --primary-light: #2a5a8c;
+            --accent: #e74c3c;
+            --agree: #27ae60;
+            --disagree: #e74c3c;
+            --neutral: #95a5a6;
+            --bg: #f5f6fa;
+            --card: #ffffff;
+            --text: #2c3e50;
+            --text-light: #7f8c8d;
+            --shadow: 0 2px 12px rgba(0,0,0,0.08);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            background: linear-gradient(135deg, var(--primary), var(--primary-light));
+            color: white;
+            padding: 30px 20px;
+            text-align: center;
+        }
+
+        header h1 {
+            font-size: 1.8em;
+            margin-bottom: 5px;
+        }
+
+        header p {
+            opacity: 0.85;
+            font-size: 1em;
+        }
+
+        /* Intro screen */
+        #intro {
+            text-align: center;
+            padding: 40px 20px;
+        }
+
+        #intro h2 {
+            font-size: 1.5em;
+            margin-bottom: 15px;
+        }
+
+        #intro p {
+            color: var(--text-light);
+            margin-bottom: 25px;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .party-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            justify-content: center;
+            margin-bottom: 30px;
+        }
+
+        .party-tag {
+            background: var(--card);
+            border: 1px solid #e0e0e0;
+            border-radius: 20px;
+            padding: 6px 14px;
+            font-size: 0.85em;
+            font-weight: 500;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 14px 40px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background: var(--accent);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #c0392b;
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: var(--primary-light);
+        }
+
+        /* Progress bar */
+        .progress-container {
+            background: #e0e0e0;
+            border-radius: 10px;
+            height: 8px;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            background: linear-gradient(90deg, var(--primary), var(--primary-light));
+            height: 100%;
+            border-radius: 10px;
+            transition: width 0.4s ease;
+        }
+
+        .progress-text {
+            text-align: center;
+            color: var(--text-light);
+            font-size: 0.9em;
+            margin-bottom: 5px;
+        }
+
+        /* Question card */
+        #quiz {
+            display: none;
+        }
+
+        .question-card {
+            background: var(--card);
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: var(--shadow);
+            margin-bottom: 20px;
+        }
+
+        .question-category {
+            display: inline-block;
+            background: var(--primary);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.8em;
+            font-weight: 500;
+            margin-bottom: 12px;
+        }
+
+        .question-text {
+            font-size: 1.25em;
+            font-weight: 600;
+            margin-bottom: 25px;
+            line-height: 1.4;
+        }
+
+        .answer-buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .answer-btn {
+            flex: 1;
+            min-width: 120px;
+            padding: 14px 10px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            background: white;
+            cursor: pointer;
+            font-size: 0.95em;
+            font-weight: 500;
+            transition: all 0.2s;
+            text-align: center;
+        }
+
+        .answer-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .answer-btn.agree {
+            border-color: var(--agree);
+            color: var(--agree);
+        }
+
+        .answer-btn.agree:hover, .answer-btn.agree.selected {
+            background: var(--agree);
+            color: white;
+        }
+
+        .answer-btn.neutral {
+            border-color: var(--neutral);
+            color: var(--neutral);
+        }
+
+        .answer-btn.neutral:hover, .answer-btn.neutral.selected {
+            background: var(--neutral);
+            color: white;
+        }
+
+        .answer-btn.disagree {
+            border-color: var(--disagree);
+            color: var(--disagree);
+        }
+
+        .answer-btn.disagree:hover, .answer-btn.disagree.selected {
+            background: var(--disagree);
+            color: white;
+        }
+
+        .nav-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 15px;
+        }
+
+        .nav-btn {
+            padding: 10px 24px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background: white;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: all 0.2s;
+        }
+
+        .nav-btn:hover {
+            background: var(--bg);
+        }
+
+        .nav-btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        /* Results */
+        #results {
+            display: none;
+        }
+
+        .results-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .results-header h2 {
+            font-size: 1.6em;
+            margin-bottom: 8px;
+        }
+
+        .match-card {
+            background: var(--card);
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: var(--shadow);
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+
+        .match-card:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+        }
+
+        .match-card.top {
+            border-left: 4px solid var(--agree);
+        }
+
+        .match-rank {
+            font-size: 1.4em;
+            font-weight: 700;
+            color: var(--text-light);
+            min-width: 35px;
+            text-align: center;
+        }
+
+        .match-card.top .match-rank {
+            color: var(--agree);
+        }
+
+        .match-info {
+            flex: 1;
+        }
+
+        .match-party {
+            font-weight: 600;
+            font-size: 1.1em;
+            margin-bottom: 2px;
+        }
+
+        .match-description {
+            font-size: 0.85em;
+            color: var(--text-light);
+        }
+
+        .match-score {
+            font-size: 1.3em;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .match-bar-container {
+            width: 100px;
+            height: 8px;
+            background: #e0e0e0;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 4px;
+        }
+
+        .match-bar {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 0.6s ease;
+        }
+
+        .match-score-wrapper {
+            text-align: right;
+        }
+
+        /* Compass visualization */
+        .compass-container {
+            background: var(--card);
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: var(--shadow);
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .compass-container h3 {
+            margin-bottom: 15px;
+        }
+
+        .compass-canvas-wrapper {
+            position: relative;
+            display: inline-block;
+        }
+
+        canvas#compass {
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            max-width: 100%;
+            height: auto;
+        }
+
+        /* Detail view */
+        .detail-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 100;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .detail-overlay.active {
+            display: flex;
+        }
+
+        .detail-card {
+            background: var(--card);
+            border-radius: 12px;
+            padding: 30px;
+            max-width: 600px;
+            width: 100%;
+            max-height: 80vh;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        .detail-close {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            border: none;
+            background: none;
+            font-size: 1.5em;
+            cursor: pointer;
+            color: var(--text-light);
+        }
+
+        .detail-party-name {
+            font-size: 1.4em;
+            font-weight: 700;
+            margin-bottom: 15px;
+        }
+
+        .detail-question {
+            padding: 10px 0;
+            border-bottom: 1px solid #f0f0f0;
+            display: flex;
+            gap: 10px;
+            align-items: flex-start;
+        }
+
+        .detail-question:last-child {
+            border-bottom: none;
+        }
+
+        .detail-icon {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75em;
+            font-weight: 700;
+            color: white;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+
+        .detail-icon.match { background: var(--agree); }
+        .detail-icon.partial { background: #f39c12; }
+        .detail-icon.mismatch { background: var(--disagree); }
+
+        .detail-q-text {
+            font-size: 0.9em;
+        }
+
+        .detail-q-text strong {
+            display: block;
+            margin-bottom: 2px;
+        }
+
+        .detail-q-text span {
+            color: var(--text-light);
+            font-size: 0.9em;
+        }
+
+        /* Restart button */
+        .restart-section {
+            text-align: center;
+            margin-top: 30px;
+            padding-bottom: 40px;
+        }
+
+        /* Disclaimer */
+        .disclaimer {
+            background: #fff3cd;
+            border: 1px solid #ffc107;
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 20px;
+            font-size: 0.85em;
+            color: #856404;
+        }
+
+        @media (max-width: 600px) {
+            header h1 { font-size: 1.4em; }
+            .question-text { font-size: 1.1em; }
+            .answer-buttons { flex-direction: column; }
+            .answer-btn { min-width: 100%; }
+            .match-card { flex-wrap: wrap; }
+            .match-bar-container { width: 80px; }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Kieswijzer Nijmegen 2026</h1>
+        <p>Gemeenteraadsverkiezingen 18 maart 2026</p>
+    </header>
+
+    <div class="container">
+        <!-- Intro Screen -->
+        <div id="intro">
+            <h2>Welke partij past bij jou?</h2>
+            <p>Beantwoord 25 stellingen over lokale onderwerpen in Nijmegen en ontdek welke partij het best bij jouw standpunten past. Je kunt kiezen uit: eens, neutraal, of oneens.</p>
+
+            <div class="party-grid">
+                <span class="party-tag">GroenLinks-PvdA</span>
+                <span class="party-tag">D66</span>
+                <span class="party-tag">Stadspartij Nijmegen</span>
+                <span class="party-tag">VVD</span>
+                <span class="party-tag">SP</span>
+                <span class="party-tag">CDA</span>
+                <span class="party-tag">Partij voor de Dieren</span>
+                <span class="party-tag">Volt</span>
+                <span class="party-tag">FvD</span>
+            </div>
+
+            <button class="btn btn-primary" onclick="startQuiz()">Start de Kieswijzer</button>
+
+            <div class="disclaimer">
+                <strong>Let op:</strong> Deze kieswijzer is een onofficieel hulpmiddel gemaakt met behulp van openbaar beschikbare verkiezingsprogramma's en standpunten. De partijposities zijn inschattingen op basis van hun programma's en publieke uitspraken. Raadpleeg altijd de officiële verkiezingsprogramma's van de partijen voor de volledige en exacte standpunten.
+            </div>
+        </div>
+
+        <!-- Quiz Screen -->
+        <div id="quiz">
+            <div class="progress-text" id="progressText">Vraag 1 van 25</div>
+            <div class="progress-container">
+                <div class="progress-bar" id="progressBar" style="width: 4%"></div>
+            </div>
+
+            <div class="question-card">
+                <span class="question-category" id="questionCategory">Wonen</span>
+                <p class="question-text" id="questionText">Loading...</p>
+
+                <div class="answer-buttons">
+                    <button class="answer-btn agree" onclick="answer(1)">Eens</button>
+                    <button class="answer-btn neutral" onclick="answer(0)">Neutraal</button>
+                    <button class="answer-btn disagree" onclick="answer(-1)">Oneens</button>
+                </div>
+            </div>
+
+            <div class="nav-buttons">
+                <button class="nav-btn" id="prevBtn" onclick="prevQuestion()" disabled>Vorige</button>
+                <button class="nav-btn" id="skipBtn" onclick="answer(null)">Sla over</button>
+            </div>
+        </div>
+
+        <!-- Results Screen -->
+        <div id="results">
+            <div class="results-header">
+                <h2>Jouw uitslag</h2>
+                <p>Op basis van jouw antwoorden passen deze partijen het best bij jou.</p>
+            </div>
+
+            <div class="compass-container">
+                <h3>Politiek Kompas Nijmegen</h3>
+                <div class="compass-canvas-wrapper">
+                    <canvas id="compass" width="500" height="500"></canvas>
+                </div>
+                <p style="font-size: 0.8em; color: var(--text-light); margin-top: 10px;">
+                    Links-Rechts: economisch | Onder-Boven: progressief-conservatief
+                </p>
+            </div>
+
+            <div id="matchList"></div>
+
+            <div class="restart-section">
+                <button class="btn btn-secondary" onclick="restart()">Opnieuw beginnen</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Detail overlay -->
+    <div class="detail-overlay" id="detailOverlay" onclick="closeDetail(event)">
+        <div class="detail-card" id="detailCard">
+            <button class="detail-close" onclick="closeDetail()">&times;</button>
+            <div id="detailContent"></div>
+        </div>
+    </div>
+
+    <script>
+    // =====================================================
+    // DATA: Questions and party positions
+    // =====================================================
+
+    const parties = [
+        {
+            id: "glpvda",
+            name: "GroenLinks-PvdA",
+            shortName: "GL-PvdA",
+            color: "#4CAF50",
+            description: "Progressief, groen en sociaal"
+        },
+        {
+            id: "d66",
+            name: "D66",
+            shortName: "D66",
+            color: "#00A86B",
+            description: "Progressief-liberaal, onderwijs en innovatie"
+        },
+        {
+            id: "stadspartij",
+            name: "Stadspartij Nijmegen",
+            shortName: "Stadspartij",
+            color: "#FF8C00",
+            description: "Lokaal, pragmatisch, onafhankelijk"
+        },
+        {
+            id: "vvd",
+            name: "VVD",
+            shortName: "VVD",
+            color: "#FF6600",
+            description: "Liberaal, vrij ondernemerschap"
+        },
+        {
+            id: "sp",
+            name: "SP",
+            shortName: "SP",
+            color: "#FF0000",
+            description: "Socialistisch, sociale rechtvaardigheid"
+        },
+        {
+            id: "cda",
+            name: "CDA",
+            shortName: "CDA",
+            color: "#007B5F",
+            description: "Christendemocratisch, gemeenschapszin"
+        },
+        {
+            id: "pvdd",
+            name: "Partij voor de Dieren",
+            shortName: "PvdD",
+            color: "#006B3F",
+            description: "Dierenwelzijn, natuur en klimaat"
+        },
+        {
+            id: "volt",
+            name: "Volt",
+            shortName: "Volt",
+            color: "#502379",
+            description: "Pro-Europees, progressief"
+        },
+        {
+            id: "fvd",
+            name: "Forum voor Democratie",
+            shortName: "FvD",
+            color: "#8B0000",
+            description: "Conservatief, directe democratie"
+        }
+    ];
+
+    // Questions with party positions
+    // Position values: 1 = eens, 0 = neutraal, -1 = oneens
+    // Axis: "econ" (left-right economics) or "prog" (progressive-conservative)
+    const questions = [
+        {
+            id: 1,
+            category: "Wonen",
+            text: "Nijmegen moet minimaal 70% sociale en betaalbare huurwoningen bouwen bij nieuwbouwprojecten.",
+            axis: "econ",
+            direction: -1, // agree = more left
+            positions: {
+                glpvda: 1, d66: 0, stadspartij: 0, vvd: -1, sp: 1, cda: 0, pvdd: 1, volt: 0, fvd: -1
+            }
+        },
+        {
+            id: 2,
+            category: "Wonen",
+            text: "Nijmeegse starters moeten voorrang krijgen op de woningmarkt boven mensen van buiten de stad.",
+            axis: "prog",
+            direction: 1, // agree = more conservative/local
+            positions: {
+                glpvda: 0, d66: -1, stadspartij: 1, vvd: 0, sp: 0, cda: 1, pvdd: -1, volt: -1, fvd: 1
+            }
+        },
+        {
+            id: 3,
+            category: "Verkeer",
+            text: "De maximumsnelheid in de hele stad moet worden verlaagd naar 30 km/u.",
+            axis: "prog",
+            direction: -1, // agree = more progressive
+            positions: {
+                glpvda: 1, d66: 0, stadspartij: -1, vvd: -1, sp: 0, cda: -1, pvdd: 1, volt: 1, fvd: -1
+            }
+        },
+        {
+            id: 4,
+            category: "Verkeer",
+            text: "Er moet een nieuwe parkeergarage komen onder het Wedrenplein om de binnenstad bereikbaar te houden voor auto's.",
+            axis: "econ",
+            direction: 1, // agree = more right
+            positions: {
+                glpvda: -1, d66: -1, stadspartij: 1, vvd: 1, sp: -1, cda: 1, pvdd: -1, volt: -1, fvd: 1
+            }
+        },
+        {
+            id: 5,
+            category: "Verkeer",
+            text: "Het openbaar vervoer in Nijmegen moet gratis worden voor alle inwoners.",
+            axis: "econ",
+            direction: -1, // agree = more left
+            positions: {
+                glpvda: 0, d66: -1, stadspartij: -1, vvd: -1, sp: 1, cda: -1, pvdd: 0, volt: 0, fvd: -1
+            }
+        },
+        {
+            id: 6,
+            category: "Milieu",
+            text: "Nijmegen moet in 2045 volledig energieneutraal zijn, ook als dat hogere kosten voor bewoners betekent.",
+            axis: "prog",
+            direction: -1, // agree = more progressive
+            positions: {
+                glpvda: 1, d66: 1, stadspartij: 0, vvd: -1, sp: 0, cda: 0, pvdd: 1, volt: 1, fvd: -1
+            }
+        },
+        {
+            id: 7,
+            category: "Milieu",
+            text: "Zonnepanelen moeten verplicht worden op alle nieuwe gebouwen in Nijmegen.",
+            axis: "econ",
+            direction: -1,
+            positions: {
+                glpvda: 1, d66: 1, stadspartij: 0, vvd: -1, sp: 1, cda: 0, pvdd: 1, volt: 1, fvd: -1
+            }
+        },
+        {
+            id: 8,
+            category: "Milieu",
+            text: "Vervuilende auto's (oude diesels) en benzinebrommers moeten geweerd worden uit de binnenstad.",
+            axis: "prog",
+            direction: -1,
+            positions: {
+                glpvda: 1, d66: 1, stadspartij: -1, vvd: -1, sp: 0, cda: 0, pvdd: 1, volt: 1, fvd: -1
+            }
+        },
+        {
+            id: 9,
+            category: "Economie",
+            text: "De gemeente moet meer investeren in het aantrekken van startups en technologiebedrijven.",
+            axis: "econ",
+            direction: 1,
+            positions: {
+                glpvda: 0, d66: 1, stadspartij: 1, vvd: 1, sp: -1, cda: 1, pvdd: -1, volt: 1, fvd: 0
+            }
+        },
+        {
+            id: 10,
+            category: "Economie",
+            text: "Winkels in de binnenstad moeten ook op zondag open mogen zijn.",
+            axis: "prog",
+            direction: -1,
+            positions: {
+                glpvda: 1, d66: 1, stadspartij: 1, vvd: 1, sp: 0, cda: -1, pvdd: 0, volt: 1, fvd: 0
+            }
+        },
+        {
+            id: 11,
+            category: "Sociaal",
+            text: "De bezuinigingen op armoederegelingen en de Meedoenregeling moeten worden teruggedraaid.",
+            axis: "econ",
+            direction: -1,
+            positions: {
+                glpvda: 1, d66: 0, stadspartij: 1, vvd: -1, sp: 1, cda: 0, pvdd: 1, volt: 0, fvd: -1
+            }
+        },
+        {
+            id: 12,
+            category: "Sociaal",
+            text: "De gemeente moet strenger controleren op bijstandsfraude.",
+            axis: "prog",
+            direction: 1,
+            positions: {
+                glpvda: -1, d66: 0, stadspartij: 0, vvd: 1, sp: -1, cda: 1, pvdd: -1, volt: -1, fvd: 1
+            }
+        },
+        {
+            id: 13,
+            category: "Sociaal",
+            text: "De Voedselbank moet worden omgevormd tot een 'sociale supermarkt' waar mensen met waardigheid boodschappen kunnen doen.",
+            axis: "econ",
+            direction: -1,
+            positions: {
+                glpvda: 1, d66: 0, stadspartij: 1, vvd: 0, sp: 1, cda: 0, pvdd: 1, volt: 0, fvd: -1
+            }
+        },
+        {
+            id: 14,
+            category: "Veiligheid",
+            text: "Het aantal toezichthouders/handhavers (BOA's) in Nijmegen moet verdubbeld worden.",
+            axis: "prog",
+            direction: 1,
+            positions: {
+                glpvda: 0, d66: 0, stadspartij: 1, vvd: 1, sp: 0, cda: 1, pvdd: -1, volt: 0, fvd: 1
+            }
+        },
+        {
+            id: 15,
+            category: "Veiligheid",
+            text: "Er moeten meer camera's in de openbare ruimte komen om de veiligheid te verbeteren.",
+            axis: "prog",
+            direction: 1,
+            positions: {
+                glpvda: -1, d66: -1, stadspartij: 0, vvd: 1, sp: -1, cda: 1, pvdd: -1, volt: -1, fvd: 1
+            }
+        },
+        {
+            id: 16,
+            category: "Democratie",
+            text: "Bewoners moeten via een bindend referendum mee kunnen beslissen over grote gemeentelijke besluiten.",
+            axis: "prog",
+            direction: 0,
+            positions: {
+                glpvda: 0, d66: 1, stadspartij: 1, vvd: 0, sp: 1, cda: 0, pvdd: 1, volt: 1, fvd: 1
+            }
+        },
+        {
+            id: 17,
+            category: "Cultuur",
+            text: "De gemeente moet meer geld uittrekken voor het behoud en de restauratie van historisch erfgoed, zoals de Stevenskerk.",
+            axis: "prog",
+            direction: 1,
+            positions: {
+                glpvda: 0, d66: 0, stadspartij: 1, vvd: 0, sp: 0, cda: 1, pvdd: 0, volt: 0, fvd: 1
+            }
+        },
+        {
+            id: 18,
+            category: "Cultuur",
+            text: "Nijmegen moet meer investeren in culturele voorzieningen en festivals.",
+            axis: "econ",
+            direction: -1,
+            positions: {
+                glpvda: 1, d66: 1, stadspartij: 1, vvd: 0, sp: 0, cda: 0, pvdd: 0, volt: 1, fvd: -1
+            }
+        },
+        {
+            id: 19,
+            category: "Dierenwelzijn",
+            text: "De hondenbelasting moet worden afgeschaft.",
+            axis: "econ",
+            direction: 1,
+            positions: {
+                glpvda: 0, d66: 0, stadspartij: 1, vvd: 1, sp: 0, cda: 1, pvdd: 1, volt: 0, fvd: 1
+            }
+        },
+        {
+            id: 20,
+            category: "Dierenwelzijn",
+            text: "De gemeente moet kiezen voor volledig plantaardige catering bij alle gemeentelijke evenementen en kantines.",
+            axis: "prog",
+            direction: -1,
+            positions: {
+                glpvda: 0, d66: 0, stadspartij: -1, vvd: -1, sp: 0, cda: -1, pvdd: 1, volt: 0, fvd: -1
+            }
+        },
+        {
+            id: 21,
+            category: "Onderwijs",
+            text: "De gemeente moet extra investeren in gelijke kansen in het onderwijs, ongeacht in welke wijk een kind opgroeit.",
+            axis: "econ",
+            direction: -1,
+            positions: {
+                glpvda: 1, d66: 1, stadspartij: 1, vvd: 0, sp: 1, cda: 1, pvdd: 1, volt: 1, fvd: 0
+            }
+        },
+        {
+            id: 22,
+            category: "Leefbaarheid",
+            text: "De bezuinigingen op wijkbibliotheken en wijkcentra moeten worden teruggedraaid.",
+            axis: "econ",
+            direction: -1,
+            positions: {
+                glpvda: 1, d66: 0, stadspartij: 1, vvd: -1, sp: 1, cda: 0, pvdd: 1, volt: 0, fvd: -1
+            }
+        },
+        {
+            id: 23,
+            category: "Leefbaarheid",
+            text: "De binnenstad moet autoluw worden met meer ruimte voor voetgangers en fietsers.",
+            axis: "prog",
+            direction: -1,
+            positions: {
+                glpvda: 1, d66: 1, stadspartij: 0, vvd: -1, sp: 0, cda: 0, pvdd: 1, volt: 1, fvd: -1
+            }
+        },
+        {
+            id: 24,
+            category: "Zorg",
+            text: "De gemeente moet de eigen bijdrage voor de aanvullende gemeentelijke zorgverzekering niet verhogen.",
+            axis: "econ",
+            direction: -1,
+            positions: {
+                glpvda: 1, d66: 0, stadspartij: 1, vvd: -1, sp: 1, cda: 0, pvdd: 1, volt: 0, fvd: 0
+            }
+        },
+        {
+            id: 25,
+            category: "Klimaat",
+            text: "Nijmegen moet radicaal vergroenen: voor elke inwoner een boom en meer natuur in de stad, ook als dit ten koste gaat van parkeerplaatsen.",
+            axis: "prog",
+            direction: -1,
+            positions: {
+                glpvda: 1, d66: 1, stadspartij: 0, vvd: -1, sp: 0, cda: 0, pvdd: 1, volt: 1, fvd: -1
+            }
+        }
+    ];
+
+    // Compass positions for parties (pre-computed based on their overall ideology)
+    // x: -1 (left) to 1 (right), y: -1 (progressive) to 1 (conservative)
+    const partyCompassPositions = {
+        glpvda:     { x: -0.65, y: -0.60 },
+        d66:        { x: -0.10, y: -0.55 },
+        stadspartij:{ x:  0.15, y:  0.10 },
+        vvd:        { x:  0.60, y:  0.20 },
+        sp:         { x: -0.75, y: -0.15 },
+        cda:        { x:  0.25, y:  0.45 },
+        pvdd:       { x: -0.55, y: -0.70 },
+        volt:       { x: -0.15, y: -0.65 },
+        fvd:        { x:  0.65, y:  0.70 }
+    };
+
+    // =====================================================
+    // QUIZ LOGIC
+    // =====================================================
+
+    let currentQuestion = 0;
+    let userAnswers = new Array(questions.length).fill(null);
+
+    function startQuiz() {
+        document.getElementById('intro').style.display = 'none';
+        document.getElementById('quiz').style.display = 'block';
+        currentQuestion = 0;
+        userAnswers = new Array(questions.length).fill(null);
+        showQuestion();
+    }
+
+    function showQuestion() {
+        const q = questions[currentQuestion];
+        document.getElementById('questionCategory').textContent = q.category;
+        document.getElementById('questionText').textContent = q.text;
+        document.getElementById('progressText').textContent = `Vraag ${currentQuestion + 1} van ${questions.length}`;
+        document.getElementById('progressBar').style.width = `${((currentQuestion + 1) / questions.length) * 100}%`;
+        document.getElementById('prevBtn').disabled = currentQuestion === 0;
+
+        // Highlight selected answer
+        const buttons = document.querySelectorAll('.answer-btn');
+        buttons.forEach(btn => btn.classList.remove('selected'));
+
+        if (userAnswers[currentQuestion] !== null && userAnswers[currentQuestion] !== undefined) {
+            const val = userAnswers[currentQuestion];
+            if (val === 1) buttons[0].classList.add('selected');
+            else if (val === 0) buttons[1].classList.add('selected');
+            else if (val === -1) buttons[2].classList.add('selected');
+        }
+    }
+
+    function answer(value) {
+        userAnswers[currentQuestion] = value;
+
+        if (currentQuestion < questions.length - 1) {
+            currentQuestion++;
+            showQuestion();
+        } else {
+            showResults();
+        }
+    }
+
+    function prevQuestion() {
+        if (currentQuestion > 0) {
+            currentQuestion--;
+            showQuestion();
+        }
+    }
+
+    function showResults() {
+        document.getElementById('quiz').style.display = 'none';
+        document.getElementById('results').style.display = 'block';
+
+        const scores = calculateScores();
+        renderCompass(scores);
+        renderMatchList(scores);
+    }
+
+    function calculateScores() {
+        const scores = {};
+
+        parties.forEach(party => {
+            let totalMatch = 0;
+            let totalAnswered = 0;
+
+            questions.forEach((q, i) => {
+                if (userAnswers[i] === null || userAnswers[i] === undefined) return;
+
+                const userPos = userAnswers[i];
+                const partyPos = q.positions[party.id];
+
+                totalAnswered++;
+
+                // Score: 2 for exact match, 1 for partial (one is neutral), 0 for mismatch
+                if (userPos === partyPos) {
+                    totalMatch += 2;
+                } else if (userPos === 0 || partyPos === 0) {
+                    totalMatch += 1;
+                } else if (userPos === -partyPos) {
+                    totalMatch += 0;
+                }
+            });
+
+            const maxScore = totalAnswered * 2;
+            const percentage = maxScore > 0 ? Math.round((totalMatch / maxScore) * 100) : 0;
+
+            scores[party.id] = {
+                party: party,
+                percentage: percentage,
+                totalMatch: totalMatch,
+                maxScore: maxScore
+            };
+        });
+
+        return scores;
+    }
+
+    function getUserCompassPosition() {
+        let econScore = 0;
+        let progScore = 0;
+        let econCount = 0;
+        let progCount = 0;
+
+        questions.forEach((q, i) => {
+            if (userAnswers[i] === null || userAnswers[i] === undefined) return;
+
+            const val = userAnswers[i] * q.direction;
+
+            if (q.axis === "econ") {
+                econScore += val;
+                econCount++;
+            } else if (q.axis === "prog") {
+                progScore += val;
+                progCount++;
+            }
+        });
+
+        return {
+            x: econCount > 0 ? econScore / econCount : 0,
+            y: progCount > 0 ? progScore / progCount : 0
+        };
+    }
+
+    function renderCompass(scores) {
+        const canvas = document.getElementById('compass');
+        const ctx = canvas.getContext('2d');
+        const w = canvas.width;
+        const h = canvas.height;
+        const cx = w / 2;
+        const cy = h / 2;
+        const padding = 50;
+        const plotSize = w - padding * 2;
+
+        ctx.clearRect(0, 0, w, h);
+
+        // Background quadrants
+        ctx.globalAlpha = 0.08;
+        ctx.fillStyle = '#e74c3c';
+        ctx.fillRect(padding, padding, plotSize / 2, plotSize / 2); // top-left: auth-left
+        ctx.fillStyle = '#3498db';
+        ctx.fillRect(cx, padding, plotSize / 2, plotSize / 2); // top-right: auth-right
+        ctx.fillStyle = '#2ecc71';
+        ctx.fillRect(padding, cy, plotSize / 2, plotSize / 2); // bottom-left: lib-left
+        ctx.fillStyle = '#f39c12';
+        ctx.fillRect(cx, cy, plotSize / 2, plotSize / 2); // bottom-right: lib-right
+        ctx.globalAlpha = 1;
+
+        // Grid lines
+        ctx.strokeStyle = '#ddd';
+        ctx.lineWidth = 1;
+        for (let i = 0; i <= 4; i++) {
+            const pos = padding + (plotSize / 4) * i;
+            ctx.beginPath();
+            ctx.moveTo(pos, padding);
+            ctx.lineTo(pos, h - padding);
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.moveTo(padding, pos);
+            ctx.lineTo(w - padding, pos);
+            ctx.stroke();
+        }
+
+        // Axes
+        ctx.strokeStyle = '#999';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(cx, padding);
+        ctx.lineTo(cx, h - padding);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(padding, cy);
+        ctx.lineTo(w - padding, cy);
+        ctx.stroke();
+
+        // Labels
+        ctx.fillStyle = '#666';
+        ctx.font = '12px Segoe UI, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText('Conservatief', cx, padding - 10);
+        ctx.fillText('Progressief', cx, h - padding + 25);
+        ctx.save();
+        ctx.translate(padding - 10, cy);
+        ctx.rotate(-Math.PI / 2);
+        ctx.fillText('Links', 0, 0);
+        ctx.restore();
+        ctx.save();
+        ctx.translate(w - padding + 15, cy);
+        ctx.rotate(-Math.PI / 2);
+        ctx.fillText('Rechts', 0, 0);
+        ctx.restore();
+
+        // Plot parties
+        parties.forEach(party => {
+            const pos = partyCompassPositions[party.id];
+            const px = cx + pos.x * (plotSize / 2);
+            const py = cy - pos.y * (plotSize / 2); // invert y: positive = up (conservative)
+
+            // Dot
+            ctx.beginPath();
+            ctx.arc(px, py, 8, 0, Math.PI * 2);
+            ctx.fillStyle = party.color;
+            ctx.fill();
+            ctx.strokeStyle = 'white';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+
+            // Label
+            ctx.fillStyle = '#333';
+            ctx.font = 'bold 11px Segoe UI, sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText(party.shortName, px, py - 14);
+        });
+
+        // Plot user position
+        const userPos = getUserCompassPosition();
+        const ux = cx + userPos.x * (plotSize / 2);
+        const uy = cy - userPos.y * (plotSize / 2);
+
+        // Star shape for user
+        ctx.beginPath();
+        const spikes = 5;
+        const outerR = 14;
+        const innerR = 7;
+        for (let i = 0; i < spikes * 2; i++) {
+            const r = i % 2 === 0 ? outerR : innerR;
+            const angle = (i * Math.PI / spikes) - Math.PI / 2;
+            const sx = ux + Math.cos(angle) * r;
+            const sy = uy + Math.sin(angle) * r;
+            if (i === 0) ctx.moveTo(sx, sy);
+            else ctx.lineTo(sx, sy);
+        }
+        ctx.closePath();
+        ctx.fillStyle = '#e74c3c';
+        ctx.fill();
+        ctx.strokeStyle = 'white';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+
+        ctx.fillStyle = '#e74c3c';
+        ctx.font = 'bold 12px Segoe UI, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText('JIJ', ux, uy - 20);
+    }
+
+    function renderMatchList(scores) {
+        const sorted = Object.values(scores).sort((a, b) => b.percentage - a.percentage);
+        const container = document.getElementById('matchList');
+        container.innerHTML = '';
+
+        sorted.forEach((result, index) => {
+            const card = document.createElement('div');
+            card.className = `match-card${index === 0 ? ' top' : ''}`;
+            card.onclick = () => showDetail(result.party.id);
+
+            const barColor = result.percentage >= 70 ? '#27ae60' :
+                           result.percentage >= 50 ? '#f39c12' : '#e74c3c';
+
+            card.innerHTML = `
+                <div class="match-rank">${index + 1}</div>
+                <div class="match-info">
+                    <div class="match-party">${result.party.name}</div>
+                    <div class="match-description">${result.party.description}</div>
+                </div>
+                <div class="match-score-wrapper">
+                    <div class="match-score">${result.percentage}%</div>
+                    <div class="match-bar-container">
+                        <div class="match-bar" style="width: ${result.percentage}%; background: ${barColor}"></div>
+                    </div>
+                </div>
+            `;
+
+            container.appendChild(card);
+        });
+    }
+
+    function showDetail(partyId) {
+        const party = parties.find(p => p.id === partyId);
+        const overlay = document.getElementById('detailOverlay');
+        const content = document.getElementById('detailContent');
+
+        let html = `<div class="detail-party-name" style="color: ${party.color}">${party.name}</div>`;
+        html += `<p style="color: var(--text-light); margin-bottom: 15px; font-size: 0.9em;">Vergelijking per stelling (klik buiten om te sluiten)</p>`;
+
+        questions.forEach((q, i) => {
+            if (userAnswers[i] === null || userAnswers[i] === undefined) return;
+
+            const userPos = userAnswers[i];
+            const partyPos = q.positions[partyId];
+
+            let iconClass, iconText;
+            if (userPos === partyPos) {
+                iconClass = 'match';
+                iconText = '=';
+            } else if (userPos === 0 || partyPos === 0) {
+                iconClass = 'partial';
+                iconText = '~';
+            } else {
+                iconClass = 'mismatch';
+                iconText = '!';
+            }
+
+            const posLabel = (val) => val === 1 ? 'Eens' : val === -1 ? 'Oneens' : 'Neutraal';
+
+            html += `
+                <div class="detail-question">
+                    <div class="detail-icon ${iconClass}">${iconText}</div>
+                    <div class="detail-q-text">
+                        <strong>${q.text}</strong>
+                        <span>Jij: ${posLabel(userPos)} | ${party.shortName}: ${posLabel(partyPos)}</span>
+                    </div>
+                </div>
+            `;
+        });
+
+        content.innerHTML = html;
+        overlay.classList.add('active');
+    }
+
+    function closeDetail(event) {
+        if (event && event.target !== document.getElementById('detailOverlay')) return;
+        document.getElementById('detailOverlay').classList.remove('active');
+    }
+
+    // Close overlay when clicking outside card, or when clicking close button
+    document.getElementById('detailOverlay').addEventListener('click', function(e) {
+        if (e.target === this) {
+            this.classList.remove('active');
+        }
+    });
+
+    function restart() {
+        document.getElementById('results').style.display = 'none';
+        document.getElementById('intro').style.display = 'block';
+        currentQuestion = 0;
+        userAnswers = new Array(questions.length).fill(null);
+    }
+    </script>
+</body>
+</html>
